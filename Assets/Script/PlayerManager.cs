@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
-    private AIDestinationSetter AI_DestinationSetter;
+    [HideInInspector] public AIDestinationSetter AI_DestinationSetter;
     [SerializeField] private GameObject pointer;
     // Start is called before the first frame update
     void Start()
@@ -17,6 +17,11 @@ public class PlayerManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Move();
+    }
+
+    void Move()
+    {
         if (Input.GetMouseButtonDown(0))
         {
             Vector3 worldPosition;
@@ -24,35 +29,16 @@ public class PlayerManager : MonoBehaviour
             mousePos.z = Camera.main.nearClipPlane;
             worldPosition = Camera.main.ScreenToWorldPoint(mousePos);
             pointer.transform.position = worldPosition;
-            AI_DestinationSetter.target = pointer.transform;
-
-
-            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero, 200, LayerMask.GetMask(GameConstant.OBSTACLE));
 
             if (hit.collider != null)
             {
-               
-                Debug.Log(hit.collider.gameObject.name);
+                AI_DestinationSetter.target = this.transform;
+                return;
             }
+            AI_DestinationSetter.target = pointer.transform;
         }
+
     }
 
-    void OnMouseDown()
-    {
-        /*var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        RaycastHit hit = new RaycastHit();
-
-        if (Physics.Raycast(ray, out hit))
-        {
-            AI_DestinationSetter.target = hit.collider.gameObject.transform;
-            Debug.Log(hit.collider.gameObject.name);
-        }*/
-
-        Vector3 mousePos = Input.mousePosition;
-        print("Apretando");
-        pointer.transform.position = mousePos;
-        AI_DestinationSetter.target = pointer.transform;
-    }
-    
 }
