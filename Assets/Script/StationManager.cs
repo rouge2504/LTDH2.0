@@ -7,6 +7,11 @@ public class StationManager : MonoBehaviour
 {
     private GameObject player;
     private float distance;
+
+    [SerializeField] private float timeToMakeFood = 5;
+    [SerializeField] private float timingToMakeFood;
+    private bool makingFood;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -18,6 +23,20 @@ public class StationManager : MonoBehaviour
     {
         UseStation();
         distance = Vector3.Distance(player.transform.position, this.transform.position);
+        MakeFood();
+    }
+
+    private void MakeFood()
+    {
+        if (makingFood && distance < GameConstant.MAX_DISTANCE_OBSTACLE)
+        {
+            timingToMakeFood += Time.deltaTime;
+            if (timingToMakeFood > timeToMakeFood)
+            {
+                makingFood = false;
+                timingToMakeFood = 0;
+            }
+        }
     }
 
     private void UseStation()
@@ -31,7 +50,10 @@ public class StationManager : MonoBehaviour
                 if (distance < GameConstant.MAX_DISTANCE_OBSTACLE)
                 {
                     player.GetComponent<AIPath>().canMove = false;
+                    makingFood = true;
+                    return;
                 }
+                PlayerManager.instance.AI_DestinationSetter.target = this.transform;
                 Debug.Log(hit.collider.gameObject.name);
             }
         }
